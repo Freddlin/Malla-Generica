@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Malla Curricular - Medicina UBA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Patrick+Hand&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background-color: #fdfdfd;
+      color: #222;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    header img {
+      height: 60px;
+      display: block;
+      margin: 0 auto 10px;
+    }
+
+    header h1 {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2rem;
+      margin: 0;
+      color: #333;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .column {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 1rem;
+      flex: 1 1 300px;
+      max-width: 350px;
+    }
+
+    h2 {
+      background-color: #c999af;
+      color: #fff;
+      font-family: 'Patrick Hand', cursive;
+      text-align: center;
+      padding: 0.5rem;
+      margin: 0 0 0.5rem;
+      border-radius: 5px;
+    }
+
+    h3 {
+      background-color: #eee;
+      margin: 0.8rem 0 0.4rem;
+      padding: 0.3rem;
+      font-family: 'Patrick Hand', cursive;
+      border-radius: 4px;
+    }
+
+    .subject {
+      border: 2px solid #c999af;
+      background: #ffe5f0;
+      border-radius: 5px;
+      padding: 0.4rem;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      position: relative;
+      transition: background 0.2s ease-in-out;
+    }
+
+    .subject.locked {
+      background: #e3b1c8;
+      color: #555;
+      border-style: dashed;
+      cursor: not-allowed;
+    }
+
+    .subject.approved {
+      background: #fdcae1;
+      text-decoration: line-through;
+      color: #333;
+    }
+
+    .subject:hover:not(.locked):not(.approved) {
+      background: #fdcae170;
+    }
+
+    .tooltip {
+      visibility: hidden;
+      background: #333;
+      color: #fff;
+      text-align: center;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .subject.locked:hover .tooltip {
+      visibility: visible;
+    }
+
+    /* Responsive ajustes */
+    @media screen and (max-width: 768px) {
+      h1 { font-size: 1.6rem; }
+      .grid { gap: 0.8rem; }
+      .column { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo-uba.png" alt="Logo UBA">
+    <h1>Malla Curricular Medicina UBA</h1>
+  </header>
+
+  <div class="grid" id="materias"></div>
+
+  <script>
+    // Datos de la malla curricular
+    const materias = [
+      {
+        titulo: "CBC",
+        items: [
+          "Química",
+          "Int. Con. Sociedad y Estado",
+          "Int. Pensamiento Científico",
+          "Matemática",
+          "Física e Int. Biofísica",
+          "Biología e Int. Biología Celular"
+        ]
+      },
+      {
+        titulo: "CICLO BIOMÉDICO*",
+        secciones: [
+          {
+            subtitulo: "PRIMER AÑO",
+            items: [
+              ["Anatomía", ["CBC"]],
+              ["Histología - Biología Celular Embriología - Genética", ["CBC"]],
+              ["Salud Mental I", ["CBC"]],
+              ["Bioética I", ["CBC"]],
+              ["Medicina Familiar", ["CBC"]],
+            ]
+          },
+          {
+            subtitulo: "SEGUNDO AÑO",
+            items: [
+              ["Química Biológica", ["Anatomía", "Histología - Biología Celular Embriología - Genética"]],
+              ["Fisiología y Biofísica", ["Anatomía", "Histología - Biología Celular Embriología - Genética"]]
+            ]
+          },
+          {
+            subtitulo: "TERCER AÑO",
+            items: [
+              ["Microbiología y Parasitología I", ["Química Biológica", "Fisiología y Biofísica"]],
+              ["Inmunología Humana", ["Química Biológica", "Fisiología y Biofísica"]],
+              ["Microbiología y Parasitología II", ["Microbiología y Parasitología I", "Inmunología Humana"]],
+              ["Patología I", ["Química Biológica", "Fisiología y Biofísica"]],
+              ["Farmacología I", ["Química Biológica", "Fisiología y Biofísica"]]
+            ]
+          }
+        ]
+      },
+      {
+        titulo: "CICLO CLÍNICO",
+        items: [
+          ["Medicina A (Semiología-Fisiopatología)", ["Microbiología y Parasitología I", "Inmunología Humana", "Patología I", "Farmacología I", "Salud Mental I", "Bioética I"]],
+          ["Patología II", ["Microbiología y Parasitología I", "Inmunología Humana", "Patología I", "Farmacología I", "Salud Mental I", "Bioética I"]],
+          ["Salud Pública I", ["Microbiología y Parasitología II"]],
+          ["Farmacología II", ["Medicina A (Semiología-Fisiopatología)"]],
+          ["Salud Pública II", ["Salud Pública I"]],
+          ["Medicina Legal", ["Psiquiatría"]],
+          ["Bioética II", ["Bioética I"]],
+          ["Toxicología", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]]
+        ],
+        secciones: [
+          {
+            subtitulo: "CLÍNICAS",
+            items: [
+              ["Medicina B (Medicina Interna)", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Nutrición", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Diagnóstico por Imágenes", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Dermatología", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Infectología", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Neumonología", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Neurología", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Psiquiatría", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]]
+            ]
+          },
+          {
+            subtitulo: "QUIRÚRGICAS",
+            items: [
+              ["Pediatría", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Obstetricia", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Ginecología", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Cirugía General", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Urología", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Ortopedia-Traumatología", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Oftalmología", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Otorrinolaringología", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]],
+              ["Neurocirugía", ["Medicina A (Semiología-Fisiopatología)", "Patología II"]]
+            ]
+          }
+        ]
+      },
+      {
+        titulo: "CICLO INTERNADO ANUAL ROTATORIO",
+        items: [
+          ["Clínica Médica", ["Ciclo Clínico"]],
+          ["Cirugía", ["Ciclo Clínico"]],
+          ["Tocoginecología", ["Ciclo Clínico"]],
+          ["Pediatría Internado", ["Ciclo Clínico"]],
+          ["Salud Mental II", ["Ciclo Clínico"]],
+          ["APS", ["Ciclo Clínico"]],
+          ["Módulo Específico / Curso de Residencia", ["Ciclo Clínico"]]
+        ]
+      }
+    ];
+
+    let approved = new Set(JSON.parse(localStorage.getItem("approvedSubjects") || "[]"));
+    const container = document.getElementById("materias");
+
+    function createSubject(name, req = []) {
+      const div = document.createElement("div");
+      div.className = "subject";
+      div.textContent = name;
+      div.dataset.name = name;
+      div.dataset.req = JSON.stringify(req);
+      div.addEventListener("click", () => {
+        if (div.classList.contains("locked")) return;
+        if (approved.has(name)) approved.delete(name);
+        else approved.add(name);
+        updateSubjects();
+      });
+      return div;
+    }
+
+    function render() {
+      materias.forEach(col => {
+        const column = document.createElement("div");
+        column.className = "column";
+
+        const h2 = document.createElement("h2");
+        h2.textContent = col.titulo;
+        column.appendChild(h2);
+
+        if (col.items) {
+          col.items.forEach(item => {
+            const el = Array.isArray(item) ? createSubject(item[0], item[1]) : createSubject(item);
+            column.appendChild(el);
+          });
+        }
+
+        if (col.secciones) {
+          col.secciones.forEach(sec => {
+            const h3 = document.createElement("h3");
+            h3.textContent = sec.subtitulo;
+            column.appendChild(h3);
+            sec.items.forEach(([name, req]) => {
+              const el = createSubject(name, req);
+              column.appendChild(el);
+            });
+          });
+        }
+
+        container.appendChild(column);
+      });
+    }
+
+    function isCbcComplete() {
+      return Array.from(document.querySelectorAll(".column:nth-child(1) .subject")).every(el => approved.has(el.dataset.name));
+    }
+
+    function isCicloClinicoComplete() {
+      return Array.from(document.querySelectorAll(".column:nth-child(3) .subject")).every(el => approved.has(el.dataset.name));
+    }
+
+    function getRequirementText(reqs) {
+      if (!reqs.length) return "";
+      if (reqs.includes("CBC")) return "Requiere CBC completo";
+      if (reqs.includes("Ciclo Clínico")) return "Requiere Ciclo Clínico completo";
+      return "Requiere: " + reqs.join(", ");
+    }
+
+    function updateSubjects() {
+      document.querySelectorAll(".subject").forEach(subj => {
+        const name = subj.dataset.name;
+        const req = JSON.parse(subj.dataset.req || "[]");
+        const isApproved = approved.has(name);
+        const allReqMet = req.every(r => r === "CBC" ? isCbcComplete() :
+                                         r === "Ciclo Clínico" ? isCicloClinicoComplete() : approved.has(r));
+
+        subj.classList.remove("locked", "approved");
+        subj.querySelector(".tooltip")?.remove();
+
+        if (isApproved) {
+          subj.classList.add("approved");
+        } else if (!allReqMet) {
+          subj.classList.add("locked");
+          const tooltip = document.createElement("span");
+          tooltip.className = "tooltip";
+          tooltip.textContent = getRequirementText(req);
+          subj.appendChild(tooltip);
+        }
+      });
+
+      localStorage.setItem("approvedSubjects", JSON.stringify([...approved]));
+    }
+
+    render();
+    updateSubjects();
+  </script>
+
+  <!-- 
+    ✅ Cómo personalizar:
+    - Para cambiar el logo: reemplazá el archivo "logo-uba.png".
+    - Para agregar o quitar materias: modificá el arreglo `materias` en el script.
+    - GitHub Pages: subí este archivo al repositorio y activá Pages.
+  -->
+</body>
+</html>
